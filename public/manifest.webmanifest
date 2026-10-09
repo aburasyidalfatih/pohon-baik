@@ -1,0 +1,122 @@
+{
+  "id": "/hari-ini",
+  "name": "Pohon Baik",
+  "short_name": "Pohon Baik",
+  "description": "Kurikulum keluarga Muslim 0–15 tahun: ritme harian mengikuti waktu shalat, tema Qur'an, dan tumbuh kembang anak.",
+  "lang": "id",
+  "dir": "ltr",
+  "start_url": "/hari-ini",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": [
+    "standalone"
+  ],
+  "orientation": "portrait",
+  "background_color": "#f5f4ef",
+  "theme_color": "#f5f4ef",
+  "categories": [
+    "education",
+    "lifestyle",
+    "parenting"
+  ],
+  "launch_handler": {
+    "client_mode": "navigate-existing"
+  },
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-maskable-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Hari ini",
+      "short_name": "Hari ini",
+      "url": "/hari-ini",
+      "icons": [
+        {
+          "src": "/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Murajaah Qur'an",
+      "short_name": "Qur'an",
+      "url": "/quran",
+      "icons": [
+        {
+          "src": "/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Catat momen anak",
+      "short_name": "Momen",
+      "url": "/anak?tab=momen",
+      "icons": [
+        {
+          "src": "/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshots/hari-ini.png",
+      "sizes": "1082x2342",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Hari ini: tugas mengikuti waktu shalat"
+    },
+    {
+      "src": "/screenshots/tema.png",
+      "sizes": "1082x2342",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Tema bulanan dari 12 surah"
+    },
+    {
+      "src": "/screenshots/anak.png",
+      "sizes": "1082x2342",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Kenali tumbuh kembang anak sesuai usia"
+    },
+    {
+      "src": "/screenshots/majelis.png",
+      "sizes": "1082x2342",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Majelis Malam bersama keluarga"
+    }
+  ]
+}

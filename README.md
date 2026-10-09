@@ -1,67 +1,65 @@
-# Payload Blank Template
+# Pohon Baik · aplikasi web (SaaS)
 
-This template comes configured with the bare minimum to get started on anything you need.
+Monolit **Next.js 16.3 + Payload CMS 3.90 + PostgreSQL**. Rancangan lengkap: [`../arsitektur-saas-nextjs.md`](../arsitektur-saas-nextjs.md). Prototype lama tetap di [`../app`](../app) dan menjadi sumber materi.
 
-## Quick start
+## Menjalankan di laptop
 
-This template can be deployed directly from our Cloud hosting and it will setup MongoDB and cloud S3 object storage for media.
+Butuh Node 22 dan Docker Desktop.
 
-## Quick Start - local setup
+```bash
+npm install
+npm run db:up          # PostgreSQL 17 di Docker (port 5432)
+cp .env.example .env   # lalu isi PAYLOAD_SECRET dengan string acak panjang
+npm run seed           # impor materi dari ../app (aman diulang)
+npm run dev            # http://localhost:3000
+```
 
-To spin up this template locally, follow these steps:
+| Alamat | Isi |
+|---|---|
+| `/` | Halaman sambutan |
+| `/daftar`, `/masuk` | Akun orang tua (email + kata sandi) |
+| `/hari-ini` | Hari ini: langit sesuai waktu shalat, tema berjalan, tugas tema per anak, Majelis Malam (dari database) |
+| `/langganan` | Status masa coba & langganan per anak, bayar (Midtrans), keringanan, riwayat |
+| `/admin` | Panel admin & CMS. Staf pertama yang dibuat otomatis menjadi admin |
+| `/design` | Galeri design system (hanya saat pengembangan) |
 
-### Clone
+Akun uji lokal: [`scripts/dev-accounts.md`](scripts/dev-accounts.md).
 
-After you click the `Deploy` button above, you'll want to have standalone copy of this repo on your machine. If you've already cloned this repo, skip to [Development](#development).
+## Perintah
 
-### Development
+| Perintah | Fungsi |
+|---|---|
+| `npm run seed` | Impor/perbarui materi dari prototype. Dokumen dicocokkan lewat kunci alami; status tinjauan yang sudah diberikan tidak diubah |
+| `npm run test:int` | Uji: logika kurikulum (golden test vs prototype, 4.000+ perbandingan waktu shalat) dan access control data keluarga |
+| `npm run generate:types` | Perbarui `src/payload-types.ts` setelah mengubah koleksi |
+| `npm run payload migrate:create <nama>` | Buat migrasi setelah mengubah skema (production memakai migrasi; dev memakai push otomatis) |
+| `npm run build` | Build production |
 
-1. First [clone the repo](#clone) if you have not done so already
-2. `cd my-project && cp .env.example .env` to copy the example environment variables. You'll need to add the `MONGODB_URL` from your Cloud project to your `.env` if you want to use S3 storage and the MongoDB database that was created for you.
+## Struktur
 
-3. `pnpm install && pnpm dev` to install dependencies and start the dev server
-4. open `http://localhost:3000` to open the app in your browser
+```
+src/
+├─ app/(frontend)/          aplikasi orang tua: (auth)/masuk|daftar, (app)/hari-ini|tema|quran|anak|keluarga, design/
+├─ app/(payload)/           panel admin & REST/GraphQL API (dibuat Payload, jangan diubah)
+├─ collections/
+│  ├─ content.ts            materi: bands, branches, modules, themes, themeTasks, majelis, ageProfiles, warnings, contentReviews
+│  ├─ family.ts             parents (auth), families, children
+│  └─ Users.ts              staf: admin · konten · peninjau · dukungan
+├─ access/                  aturan akses (UU PDP: staf konten tidak bisa melihat data anak)
+├─ fields/content.ts        field & hook bersama materi (status tinjauan, pembersihan cache)
+├─ lib/prayer/praytimes.ts  waktu shalat (dipindah dari prototype, hasil identik)
+├─ lib/curriculum/          usia, kelompok usia, tema 28 hari, kartu waktu aktif, murajaah berjarak
+├─ lib/server/              sesi orang tua, query materi ber-cache (tag `content`)
+├─ components/ui|pb/        design system: primitives, langit, pohon, kartu waktu, tab bar, sheet
+├─ migrations/              migrasi database
+└─ proxy.ts                 proteksi rute (Next.js 16)
+scripts/seed-content.ts     impor materi prototype
+```
 
-That's it! Changes made in `./src` will be reflected in your app. Follow the on-screen instructions to login and create your first admin user. Then check out [Production](#production) once you're ready to build and serve your app, and [Deployment](#deployment) when you're ready to go live.
+## Aturan penting
 
-#### Docker (Optional)
-
-If you prefer to use Docker for local development instead of a local MongoDB instance, the provided docker-compose.yml file can be used.
-
-To do so, follow these steps:
-
-- Modify the `MONGODB_URL` in your `.env` file to `mongodb://127.0.0.1/<dbname>`
-- Modify the `docker-compose.yml` file's `MONGODB_URL` to match the above `<dbname>`
-- Run `docker-compose up` to start the database, optionally pass `-d` to run in the background.
-
-## How it works
-
-The Payload config is tailored specifically to the needs of most websites. It is pre-configured in the following ways:
-
-### Collections
-
-See the [Collections](https://payloadcms.com/docs/configuration/collections) docs for details on how to extend this functionality.
-
-- #### Users (Authentication)
-
-  Users are auth-enabled collections that have access to the admin panel.
-
-  For additional help, see the official [Auth Example](https://github.com/payloadcms/payload/tree/3.x/examples/auth) or the [Authentication](https://payloadcms.com/docs/authentication/overview#authentication-overview) docs.
-
-- #### Media
-
-  This is the uploads enabled collection. It features pre-configured sizes, focal point and manual resizing to help you manage your pictures.
-
-### Docker
-
-Alternatively, you can use [Docker](https://www.docker.com) to spin up this template locally. To do so, follow these steps:
-
-1. Follow [steps 1 and 2 from above](#development), the docker-compose file will automatically use the `.env` file in your project root
-1. Next run `docker-compose up`
-1. Follow [steps 4 and 5 from above](#development) to login and create your first admin user
-
-That's it! The Docker instance will help you get up and running quickly while also standardizing the development environment across your teams.
-
-## Questions
-
-If you have any issues or questions, reach out to us on [Discord](https://discord.com/invite/payload) or start a [GitHub discussion](https://github.com/payloadcms/payload/discussions).
+- **Zona waktu:** semua tanggal berupa string `YYYY-MM-DD` dan "sekarang" dihitung dengan zona waktu keluarga (`localNow(tz)`), bukan zona server.
+- **Materi tampil** hanya yang berstatus *Disetujui*. Saat pengembangan/pemakaian pribadi, `CONTENT_INCLUDE_UNREVIEWED=true` menampilkan materi hasil seed yang masih *Perlu ditinjau*. Menyimpan **Catatan tinjauan** otomatis mengubah status materi yang ditinjau.
+- **Sesi:** orang tua dan staf memakai cookie yang sama (`payload-token`). Masuk ke `/admin` dengan akun staf di browser/profil terpisah dari akun orang tua.
+- **Langganan:** gratis 30 hari untuk semua anak sejak keluarga dibuat (`families.trialEndsAt`), lalu Rp25.000 per anak per tahun (`children.paidUntil`). Aturan dan harga ada di `src/lib/billing/rules.ts`. Anak yang belum aktif: tugas per anak, Anakku, dan Qur'an terkunci (data tidak dikirim ke browser, penulisan ditolak di hook koleksi); tanda bahaya, Majelis Malam, Tema, dan unduh cadangan tetap terbuka. Field langganan hanya bisa diubah server/staf, bukan orang tua lewat API.
+- **Pembayaran:** Midtrans Snap. Notifikasi masuk ke `/webhooks/midtrans` (tanda tangan diverifikasi, status dicek ulang ke API). Tanpa `MIDTRANS_SERVER_KEY` saat pengembangan, pembayaran memakai halaman simulasi `/langganan/simulasi`. Keringanan disetujui staf di admin → Keluarga → bagian *Keringanan biaya*.

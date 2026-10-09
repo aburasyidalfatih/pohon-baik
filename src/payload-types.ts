@@ -64,11 +64,30 @@ export type SupportedTimezones =
 export interface Config {
   auth: {
     users: UserAuthOperations;
+    parents: ParentAuthOperations;
   };
   blocks: {};
   collections: {
-    users: User;
+    bands: Band;
+    branches: Branch;
+    modules: Module;
+    themes: Theme;
+    themeTasks: ThemeTask;
+    majelis: Majeli;
+    ageProfiles: AgeProfile;
+    warnings: Warning;
+    contentReviews: ContentReview;
     media: Media;
+    users: User;
+    parents: Parent;
+    families: Family;
+    children: Child;
+    dailyLogs: DailyLog;
+    quranEntries: QuranEntry;
+    moments: Moment;
+    milestones: Milestone;
+    raporEntries: RaporEntry;
+    orders: Order;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -76,8 +95,26 @@ export interface Config {
   };
   collectionsJoins: {};
   collectionsSelect: {
-    users: UsersSelect<false> | UsersSelect<true>;
+    bands: BandsSelect<false> | BandsSelect<true>;
+    branches: BranchesSelect<false> | BranchesSelect<true>;
+    modules: ModulesSelect<false> | ModulesSelect<true>;
+    themes: ThemesSelect<false> | ThemesSelect<true>;
+    themeTasks: ThemeTasksSelect<false> | ThemeTasksSelect<true>;
+    majelis: MajelisSelect<false> | MajelisSelect<true>;
+    ageProfiles: AgeProfilesSelect<false> | AgeProfilesSelect<true>;
+    warnings: WarningsSelect<false> | WarningsSelect<true>;
+    contentReviews: ContentReviewsSelect<false> | ContentReviewsSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
+    users: UsersSelect<false> | UsersSelect<true>;
+    parents: ParentsSelect<false> | ParentsSelect<true>;
+    families: FamiliesSelect<false> | FamiliesSelect<true>;
+    children: ChildrenSelect<false> | ChildrenSelect<true>;
+    dailyLogs: DailyLogsSelect<false> | DailyLogsSelect<true>;
+    quranEntries: QuranEntriesSelect<false> | QuranEntriesSelect<true>;
+    moments: MomentsSelect<false> | MomentsSelect<true>;
+    milestones: MilestonesSelect<false> | MilestonesSelect<true>;
+    raporEntries: RaporEntriesSelect<false> | RaporEntriesSelect<true>;
+    orders: OrdersSelect<false> | OrdersSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -87,13 +124,17 @@ export interface Config {
     defaultIDType: string;
   };
   fallbackLocale: null;
-  globals: {};
-  globalsSelect: {};
+  globals: {
+    kurikulum: Kurikulum;
+  };
+  globalsSelect: {
+    kurikulum: KurikulumSelect<false> | KurikulumSelect<true>;
+  };
   locale: null;
   widgets: {
     collections: CollectionsWidget;
   };
-  user: User;
+  user: User | Parent;
   jobs: {
     tasks: unknown;
     workflows: unknown;
@@ -117,12 +158,278 @@ export interface UserAuthOperations {
     password: string;
   };
 }
+export interface ParentAuthOperations {
+  forgotPassword: {
+    email: string;
+    password: string;
+  };
+  login: {
+    email: string;
+    password: string;
+  };
+  registerFirstUser: {
+    email: string;
+    password: string;
+  };
+  unlock: {
+    email: string;
+    password: string;
+  };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "bands".
+ */
+export interface Band {
+  id: string;
+  code: string;
+  label: string;
+  minMonths: number;
+  maxMonths: number;
+  targets?:
+    | {
+        text: string;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "branches".
+ */
+export interface Branch {
+  id: string;
+  code: string;
+  name: string;
+  lapis: 'Akar' | 'Batang' | 'Cabang' | 'Buah';
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "modules".
+ */
+export interface Module {
+  id: string;
+  code: string;
+  title: string;
+  description?: string | null;
+  branch: string | Branch;
+  minMonths: number;
+  maxMonths: number;
+  daily?: boolean | null;
+  waktu?: ('subuh' | 'pagi' | 'dzuhur' | 'ashar' | 'maghrib' | 'isya' | 'hari') | null;
+  /**
+   * Modul tampil untuk anak yang bebannya sama atau lebih tinggi. Usahakan 3–5 modul Inti per usia.
+   */
+  tier?: ('inti' | 'seimbang' | 'penuh') | null;
+  reviewStatus: 'review' | 'approved' | 'revise';
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "themes".
+ */
+export interface Theme {
+  id: string;
+  order: number;
+  title: string;
+  surah: string;
+  ayat?: string | null;
+  science?: string | null;
+  skill?: string | null;
+  reviewStatus: 'review' | 'approved' | 'revise';
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "themeTasks".
+ */
+export interface ThemeTask {
+  id: string;
+  themeOrder?: number | null;
+  bandMin?: number | null;
+  theme: string | Theme;
+  band: string | Band;
+  week: number;
+  order: number;
+  waktu: 'subuh' | 'pagi' | 'dzuhur' | 'ashar' | 'maghrib' | 'isya' | 'hari';
+  text: string;
+  reviewStatus: 'review' | 'approved' | 'revise';
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "majelis".
+ */
+export interface Majeli {
+  id: string;
+  themeOrder?: number | null;
+  theme: string | Theme;
+  day: number;
+  story: string;
+  questions?:
+    | {
+        text: string;
+        id?: string | null;
+      }[]
+    | null;
+  reviewStatus: 'review' | 'approved' | 'revise';
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ageProfiles".
+ */
+export interface AgeProfile {
+  id: string;
+  year: number;
+  label: string;
+  title: string;
+  summary: string;
+  feelings?:
+    | {
+        text: string;
+        id?: string | null;
+      }[]
+    | null;
+  normal?:
+    | {
+        q: string;
+        a: string;
+        id?: string | null;
+      }[]
+    | null;
+  milestones?:
+    | {
+        age: string;
+        items?:
+          | {
+              text: string;
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  abilities?:
+    | {
+        domain: string;
+        items?:
+          | {
+              text: string;
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  limits?:
+    | {
+        text: string;
+        id?: string | null;
+      }[]
+    | null;
+  stimulation?:
+    | {
+        text: string;
+        id?: string | null;
+      }[]
+    | null;
+  avoid?:
+    | {
+        text: string;
+        id?: string | null;
+      }[]
+    | null;
+  islam?:
+    | {
+        text: string;
+        source?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  worship?: string | null;
+  consult?:
+    | {
+        text: string;
+        id?: string | null;
+      }[]
+    | null;
+  reviewStatus: 'review' | 'approved' | 'revise';
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "warnings".
+ */
+export interface Warning {
+  id: string;
+  label: string;
+  minMonths: number;
+  maxMonths: number;
+  items?:
+    | {
+        text: string;
+        id?: string | null;
+      }[]
+    | null;
+  reviewStatus: 'review' | 'approved' | 'revise';
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "contentReviews".
+ */
+export interface ContentReview {
+  id: string;
+  doc:
+    | {
+        relationTo: 'modules';
+        value: string | Module;
+      }
+    | {
+        relationTo: 'themes';
+        value: string | Theme;
+      }
+    | {
+        relationTo: 'themeTasks';
+        value: string | ThemeTask;
+      }
+    | {
+        relationTo: 'majelis';
+        value: string | Majeli;
+      }
+    | {
+        relationTo: 'ageProfiles';
+        value: string | AgeProfile;
+      }
+    | {
+        relationTo: 'warnings';
+        value: string | Warning;
+      };
+  status: 'approved' | 'revise';
+  notes?: string | null;
+  reviewer?: (string | null) | User;
+  updatedAt: string;
+  createdAt: string;
+}
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "users".
  */
 export interface User {
   id: string;
+  name?: string | null;
+  roles: ('admin' | 'konten' | 'peninjau' | 'dukungan')[];
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -130,6 +437,7 @@ export interface User {
   resetPasswordExpiration?: string | null;
   salt?: string | null;
   hash?: string | null;
+  resetPasswordRequestedAt?: string | null;
   loginAttempts?: number | null;
   lockUntil?: string | null;
   sessions?:
@@ -163,6 +471,263 @@ export interface Media {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "parents".
+ */
+export interface Parent {
+  id: string;
+  name: string;
+  privacyConsentAt?: string | null;
+  privacyVersion?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  email: string;
+  resetPasswordToken?: string | null;
+  resetPasswordExpiration?: string | null;
+  salt?: string | null;
+  hash?: string | null;
+  resetPasswordRequestedAt?: string | null;
+  loginAttempts?: number | null;
+  lockUntil?: string | null;
+  sessions?:
+    | {
+        id: string;
+        createdAt?: string | null;
+        expiresAt: string;
+      }[]
+    | null;
+  password?: string | null;
+  collection: 'parents';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "families".
+ */
+export interface Family {
+  id: string;
+  name: string;
+  members?:
+    | {
+        parent: string | Parent;
+        role: 'owner' | 'parent' | 'caregiver';
+        id?: string | null;
+      }[]
+    | null;
+  city:
+    | 'jakarta'
+    | 'bekasi'
+    | 'bogor'
+    | 'depok'
+    | 'tangerang'
+    | 'bandung'
+    | 'semarang'
+    | 'yogyakarta'
+    | 'solo'
+    | 'surabaya'
+    | 'malang'
+    | 'bandaaceh'
+    | 'medan'
+    | 'padang'
+    | 'pekanbaru'
+    | 'palembang'
+    | 'lampung'
+    | 'pontianak'
+    | 'banjarmasin'
+    | 'balikpapan'
+    | 'samarinda'
+    | 'makassar'
+    | 'manado'
+    | 'denpasar'
+    | 'mataram'
+    | 'kupang'
+    | 'ambon'
+    | 'jayapura'
+    | 'custom';
+  lat?: number | null;
+  lon?: number | null;
+  tz?: ('7' | '8' | '9') | null;
+  themeStart: string;
+  themeOffset: number;
+  appearance?: ('auto' | 'light' | 'dark') | null;
+  /**
+   * Diisi otomatis saat keluarga dibuat.
+   */
+  trialEndsAt?: string | null;
+  /**
+   * Setujui dengan mengubah status menjadi Disetujui. Bila "berlaku sampai" kosong, otomatis 1 tahun.
+   */
+  waiver?: {
+    status?: ('none' | 'requested' | 'approved' | 'rejected') | null;
+    reason?: string | null;
+    requestedAt?: string | null;
+    until?: string | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "children".
+ */
+export interface Child {
+  id: string;
+  family: string | Family;
+  name: string;
+  dob: string;
+  sex?: ('L' | 'P') | null;
+  abilityOverrides?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  load?: ('inti' | 'seimbang' | 'penuh') | null;
+  tahfidzTarget?: ('kualitas' | 'juz30' | 'juz29-30' | 'intensif') | null;
+  skipModules?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  /**
+   * Diperbarui otomatis setelah pembayaran lunas.
+   */
+  paidUntil?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "dailyLogs".
+ */
+export interface DailyLog {
+  id: string;
+  family: string | Family;
+  child?: (string | null) | Child;
+  date: string;
+  done:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "quranEntries".
+ */
+export interface QuranEntry {
+  id: string;
+  family: string | Family;
+  child: string | Child;
+  label: string;
+  base: string;
+  done:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "moments".
+ */
+export interface Moment {
+  id: string;
+  family: string | Family;
+  child: string | Child;
+  date: string;
+  category: 'bisa' | 'kata' | 'ibadah' | 'lucu' | 'syukur' | 'catatan';
+  text?: string | null;
+  source: 'manual' | 'milestone' | 'majelis';
+  milestoneKey?: string | null;
+  hasPhoto?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "milestones".
+ */
+export interface Milestone {
+  id: string;
+  family: string | Family;
+  child: string | Child;
+  key: string;
+  seenAt: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "raporEntries".
+ */
+export interface RaporEntry {
+  id: string;
+  family: string | Family;
+  child: string | Child;
+  semester: string;
+  branch: string;
+  level?: number | null;
+  note?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "orders".
+ */
+export interface Order {
+  id: string;
+  orderId: string;
+  family: string | Family;
+  parent?: (string | null) | Parent;
+  items?:
+    | {
+        child?: (string | null) | Child;
+        childName: string;
+        price: number;
+        paidUntil?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  amount: number;
+  status: 'pending' | 'paid' | 'failed' | 'expired' | 'refunded';
+  gateway: 'midtrans' | 'simulasi';
+  paymentUrl?: string | null;
+  paymentType?: string | null;
+  paidAt?: string | null;
+  appliedAt?: string | null;
+  lastNotification?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -186,18 +751,95 @@ export interface PayloadLockedDocument {
   id: string;
   document?:
     | ({
-        relationTo: 'users';
-        value: string | User;
+        relationTo: 'bands';
+        value: string | Band;
+      } | null)
+    | ({
+        relationTo: 'branches';
+        value: string | Branch;
+      } | null)
+    | ({
+        relationTo: 'modules';
+        value: string | Module;
+      } | null)
+    | ({
+        relationTo: 'themes';
+        value: string | Theme;
+      } | null)
+    | ({
+        relationTo: 'themeTasks';
+        value: string | ThemeTask;
+      } | null)
+    | ({
+        relationTo: 'majelis';
+        value: string | Majeli;
+      } | null)
+    | ({
+        relationTo: 'ageProfiles';
+        value: string | AgeProfile;
+      } | null)
+    | ({
+        relationTo: 'warnings';
+        value: string | Warning;
+      } | null)
+    | ({
+        relationTo: 'contentReviews';
+        value: string | ContentReview;
       } | null)
     | ({
         relationTo: 'media';
         value: string | Media;
+      } | null)
+    | ({
+        relationTo: 'users';
+        value: string | User;
+      } | null)
+    | ({
+        relationTo: 'parents';
+        value: string | Parent;
+      } | null)
+    | ({
+        relationTo: 'families';
+        value: string | Family;
+      } | null)
+    | ({
+        relationTo: 'children';
+        value: string | Child;
+      } | null)
+    | ({
+        relationTo: 'dailyLogs';
+        value: string | DailyLog;
+      } | null)
+    | ({
+        relationTo: 'quranEntries';
+        value: string | QuranEntry;
+      } | null)
+    | ({
+        relationTo: 'moments';
+        value: string | Moment;
+      } | null)
+    | ({
+        relationTo: 'milestones';
+        value: string | Milestone;
+      } | null)
+    | ({
+        relationTo: 'raporEntries';
+        value: string | RaporEntry;
+      } | null)
+    | ({
+        relationTo: 'orders';
+        value: string | Order;
       } | null);
   globalSlug?: string | null;
-  user: {
-    relationTo: 'users';
-    value: string | User;
-  };
+  user:
+    | {
+        relationTo: 'users';
+        value: string | User;
+      }
+    | {
+        relationTo: 'parents';
+        value: string | Parent;
+      };
   updatedAt: string;
   createdAt: string;
 }
@@ -207,10 +849,15 @@ export interface PayloadLockedDocument {
  */
 export interface PayloadPreference {
   id: string;
-  user: {
-    relationTo: 'users';
-    value: string | User;
-  };
+  user:
+    | {
+        relationTo: 'users';
+        value: string | User;
+      }
+    | {
+        relationTo: 'parents';
+        value: string | Parent;
+      };
   key?: string | null;
   value?:
     | {
@@ -237,25 +884,213 @@ export interface PayloadMigration {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "users_select".
+ * via the `definition` "bands_select".
  */
-export interface UsersSelect<T extends boolean = true> {
-  updatedAt?: T;
-  createdAt?: T;
-  email?: T;
-  resetPasswordToken?: T;
-  resetPasswordExpiration?: T;
-  salt?: T;
-  hash?: T;
-  loginAttempts?: T;
-  lockUntil?: T;
-  sessions?:
+export interface BandsSelect<T extends boolean = true> {
+  code?: T;
+  label?: T;
+  minMonths?: T;
+  maxMonths?: T;
+  targets?:
     | T
     | {
+        text?: T;
         id?: T;
-        createdAt?: T;
-        expiresAt?: T;
       };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "branches_select".
+ */
+export interface BranchesSelect<T extends boolean = true> {
+  code?: T;
+  name?: T;
+  lapis?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "modules_select".
+ */
+export interface ModulesSelect<T extends boolean = true> {
+  code?: T;
+  title?: T;
+  description?: T;
+  branch?: T;
+  minMonths?: T;
+  maxMonths?: T;
+  daily?: T;
+  waktu?: T;
+  tier?: T;
+  reviewStatus?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "themes_select".
+ */
+export interface ThemesSelect<T extends boolean = true> {
+  order?: T;
+  title?: T;
+  surah?: T;
+  ayat?: T;
+  science?: T;
+  skill?: T;
+  reviewStatus?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "themeTasks_select".
+ */
+export interface ThemeTasksSelect<T extends boolean = true> {
+  themeOrder?: T;
+  bandMin?: T;
+  theme?: T;
+  band?: T;
+  week?: T;
+  order?: T;
+  waktu?: T;
+  text?: T;
+  reviewStatus?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "majelis_select".
+ */
+export interface MajelisSelect<T extends boolean = true> {
+  themeOrder?: T;
+  theme?: T;
+  day?: T;
+  story?: T;
+  questions?:
+    | T
+    | {
+        text?: T;
+        id?: T;
+      };
+  reviewStatus?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ageProfiles_select".
+ */
+export interface AgeProfilesSelect<T extends boolean = true> {
+  year?: T;
+  label?: T;
+  title?: T;
+  summary?: T;
+  feelings?:
+    | T
+    | {
+        text?: T;
+        id?: T;
+      };
+  normal?:
+    | T
+    | {
+        q?: T;
+        a?: T;
+        id?: T;
+      };
+  milestones?:
+    | T
+    | {
+        age?: T;
+        items?:
+          | T
+          | {
+              text?: T;
+              id?: T;
+            };
+        id?: T;
+      };
+  abilities?:
+    | T
+    | {
+        domain?: T;
+        items?:
+          | T
+          | {
+              text?: T;
+              id?: T;
+            };
+        id?: T;
+      };
+  limits?:
+    | T
+    | {
+        text?: T;
+        id?: T;
+      };
+  stimulation?:
+    | T
+    | {
+        text?: T;
+        id?: T;
+      };
+  avoid?:
+    | T
+    | {
+        text?: T;
+        id?: T;
+      };
+  islam?:
+    | T
+    | {
+        text?: T;
+        source?: T;
+        id?: T;
+      };
+  worship?: T;
+  consult?:
+    | T
+    | {
+        text?: T;
+        id?: T;
+      };
+  reviewStatus?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "warnings_select".
+ */
+export interface WarningsSelect<T extends boolean = true> {
+  label?: T;
+  minMonths?: T;
+  maxMonths?: T;
+  items?:
+    | T
+    | {
+        text?: T;
+        id?: T;
+      };
+  reviewStatus?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "contentReviews_select".
+ */
+export interface ContentReviewsSelect<T extends boolean = true> {
+  doc?: T;
+  status?: T;
+  notes?: T;
+  reviewer?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -274,6 +1109,201 @@ export interface MediaSelect<T extends boolean = true> {
   height?: T;
   focalX?: T;
   focalY?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "users_select".
+ */
+export interface UsersSelect<T extends boolean = true> {
+  name?: T;
+  roles?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  email?: T;
+  resetPasswordToken?: T;
+  resetPasswordExpiration?: T;
+  salt?: T;
+  hash?: T;
+  resetPasswordRequestedAt?: T;
+  loginAttempts?: T;
+  lockUntil?: T;
+  sessions?:
+    | T
+    | {
+        id?: T;
+        createdAt?: T;
+        expiresAt?: T;
+      };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "parents_select".
+ */
+export interface ParentsSelect<T extends boolean = true> {
+  name?: T;
+  privacyConsentAt?: T;
+  privacyVersion?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  email?: T;
+  resetPasswordToken?: T;
+  resetPasswordExpiration?: T;
+  salt?: T;
+  hash?: T;
+  resetPasswordRequestedAt?: T;
+  loginAttempts?: T;
+  lockUntil?: T;
+  sessions?:
+    | T
+    | {
+        id?: T;
+        createdAt?: T;
+        expiresAt?: T;
+      };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "families_select".
+ */
+export interface FamiliesSelect<T extends boolean = true> {
+  name?: T;
+  members?:
+    | T
+    | {
+        parent?: T;
+        role?: T;
+        id?: T;
+      };
+  city?: T;
+  lat?: T;
+  lon?: T;
+  tz?: T;
+  themeStart?: T;
+  themeOffset?: T;
+  appearance?: T;
+  trialEndsAt?: T;
+  waiver?:
+    | T
+    | {
+        status?: T;
+        reason?: T;
+        requestedAt?: T;
+        until?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "children_select".
+ */
+export interface ChildrenSelect<T extends boolean = true> {
+  family?: T;
+  name?: T;
+  dob?: T;
+  sex?: T;
+  abilityOverrides?: T;
+  load?: T;
+  tahfidzTarget?: T;
+  skipModules?: T;
+  paidUntil?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "dailyLogs_select".
+ */
+export interface DailyLogsSelect<T extends boolean = true> {
+  family?: T;
+  child?: T;
+  date?: T;
+  done?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "quranEntries_select".
+ */
+export interface QuranEntriesSelect<T extends boolean = true> {
+  family?: T;
+  child?: T;
+  label?: T;
+  base?: T;
+  done?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "moments_select".
+ */
+export interface MomentsSelect<T extends boolean = true> {
+  family?: T;
+  child?: T;
+  date?: T;
+  category?: T;
+  text?: T;
+  source?: T;
+  milestoneKey?: T;
+  hasPhoto?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "milestones_select".
+ */
+export interface MilestonesSelect<T extends boolean = true> {
+  family?: T;
+  child?: T;
+  key?: T;
+  seenAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "raporEntries_select".
+ */
+export interface RaporEntriesSelect<T extends boolean = true> {
+  family?: T;
+  child?: T;
+  semester?: T;
+  branch?: T;
+  level?: T;
+  note?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "orders_select".
+ */
+export interface OrdersSelect<T extends boolean = true> {
+  orderId?: T;
+  family?: T;
+  parent?: T;
+  items?:
+    | T
+    | {
+        child?: T;
+        childName?: T;
+        price?: T;
+        paidUntil?: T;
+        id?: T;
+      };
+  amount?: T;
+  status?: T;
+  gateway?: T;
+  paymentUrl?: T;
+  paymentType?: T;
+  paidAt?: T;
+  appliedAt?: T;
+  lastNotification?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -314,6 +1344,38 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   batch?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "kurikulum".
+ */
+export interface Kurikulum {
+  id: string;
+  warningAlways?: string | null;
+  profileSources?:
+    | {
+        text: string;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "kurikulum_select".
+ */
+export interface KurikulumSelect<T extends boolean = true> {
+  warningAlways?: T;
+  profileSources?:
+    | T
+    | {
+        text?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

@@ -48,3 +48,6 @@ node_modules/
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+
+# Akun uji lokal (berisi kata sandi; jangan masuk repo publik)
+/scripts/dev-accounts.md

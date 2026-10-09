@@ -1,0 +1,225 @@
+@import 'tailwindcss';
+
+/* ============ Pohon Baik · design tokens (dipindah dari prototype style.css) ============ */
+/* Pasangan teks/latar diuji WCAG AA (≥4,5:1). `--ink-4` khusus garis & ikon dekoratif, bukan teks. */
+:root {
+  --bg: #f5f4ef; --surface: #ffffff; --surface-2: #f0efe9; --fill: rgba(120, 120, 110, 0.12);
+  --ink: #171a17; --ink-2: #5c625b; --ink-3: #61685f; --ink-4: #9aa098; --line: rgba(20, 30, 20, 0.08);
+  --brand: #184a30; --brand-2: #2b6e48; --brand-soft: #e3efe6; --brand-ink: #11391f; --on-brand: #ffffff;
+  --gold: #c99a2e; --gold-ink: #85600f; --gold-soft: #f7ecd3; --danger: #c2412d; --danger-strong: #b33a27; --danger-soft: #fbe7e3; --warn-soft: #fff3dc; --warn-ink: #7a5208;
+  --toast: #1e221e;
+  --sh-1: 0 1px 2px rgba(15, 30, 20, 0.05), 0 4px 16px rgba(15, 30, 20, 0.05);
+  --sh-2: 0 10px 40px rgba(15, 30, 20, 0.16);
+  --kid-1: #2b6e48; --kid-2: #c46a2b; --kid-3: #3d6fb0; --kid-4: #9b4f9a; --kid-5: #b0892c; --kid-6: #2d8a8a;
+  --trunk: #8b6a48; --leaf-hi: #7cc49a;
+  --w-subuh-bg: #e7ecf7; --w-subuh: #3a58a0; --w-pagi-bg: #fdf0d6; --w-pagi: #8f5d08; --w-dzuhur-bg: #e4f1e3; --w-dzuhur: #3f7a3a;
+  --w-ashar-bg: #fbe3d6; --w-ashar: #a84e1f; --w-maghrib-bg: #e9e3f6; --w-maghrib: #6a4bb0; --w-isya-bg: #e2e6ef; --w-isya: #3c4a6b;
+  --w-hari-bg: var(--brand-soft); --w-hari: var(--brand);
+  /* Tinggi keyboard virtual (diisi oleh AppRuntime dari visualViewport; 0 bila tidak ada). */
+  --kb: 0px;
+  color-scheme: light;
+  interpolate-size: allow-keywords;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --bg: #0e1310; --surface: #18201b; --surface-2: #1f2822; --fill: rgba(200, 210, 200, 0.1);
+    --ink: #eef1ec; --ink-2: #a8b0a6; --ink-3: #8f988d; --ink-4: #6f786d; --line: rgba(220, 235, 220, 0.08);
+    --brand: #6cc48f; --brand-2: #4fae78; --brand-soft: #1c3426; --brand-ink: #bfe8cf; --on-brand: #0e1310;
+    --gold: #e0b44f; --gold-ink: #e0b44f; --gold-soft: #3a2f16; --danger: #ff8a75; --danger-strong: #b33a27; --danger-soft: #3b1f1a; --warn-soft: #33290f; --warn-ink: #f0cf87;
+    --toast: #2b332d;
+    --sh-1: 0 1px 2px rgba(0, 0, 0, 0.3); --sh-2: 0 10px 40px rgba(0, 0, 0, 0.5);
+    --trunk: #a3825f; --leaf-hi: #7cc49a;
+    --w-subuh-bg: #1e2740; --w-subuh: #9db4ee; --w-pagi-bg: #3a2e14; --w-pagi: #f0c46a; --w-dzuhur-bg: #1f3220; --w-dzuhur: #9fd69a;
+    --w-ashar-bg: #3d2618; --w-ashar: #f0a072; --w-maghrib-bg: #2c2442; --w-maghrib: #bba4f0; --w-isya-bg: #222838; --w-isya: #a8b5d6;
+    color-scheme: dark;
+  }
+}
+:root[data-theme='dark'] {
+  --bg: #0e1310; --surface: #18201b; --surface-2: #1f2822; --fill: rgba(200, 210, 200, 0.1);
+  --ink: #eef1ec; --ink-2: #a8b0a6; --ink-3: #8f988d; --ink-4: #6f786d; --line: rgba(220, 235, 220, 0.08);
+  --brand: #6cc48f; --brand-2: #4fae78; --brand-soft: #1c3426; --brand-ink: #bfe8cf; --on-brand: #0e1310;
+  --gold: #e0b44f; --gold-ink: #e0b44f; --gold-soft: #3a2f16; --danger: #ff8a75; --danger-strong: #b33a27; --danger-soft: #3b1f1a; --warn-soft: #33290f; --warn-ink: #f0cf87;
+  --toast: #2b332d;
+  --sh-1: 0 1px 2px rgba(0, 0, 0, 0.3); --sh-2: 0 10px 40px rgba(0, 0, 0, 0.5);
+  --trunk: #a3825f; --leaf-hi: #7cc49a;
+  --w-subuh-bg: #1e2740; --w-subuh: #9db4ee; --w-pagi-bg: #3a2e14; --w-pagi: #f0c46a; --w-dzuhur-bg: #1f3220; --w-dzuhur: #9fd69a;
+  --w-ashar-bg: #3d2618; --w-ashar: #f0a072; --w-maghrib-bg: #2c2442; --w-maghrib: #bba4f0; --w-isya-bg: #222838; --w-isya: #a8b5d6;
+  color-scheme: dark;
+}
+
+/* Token → utilitas Tailwind: bg-surface, text-ink-2, bg-brand-soft, shadow-card, rounded-card, dst. */
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-fill: var(--fill);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-ink-4: var(--ink-4);
+  --color-line: var(--line);
+  --color-brand: var(--brand);
+  --color-brand-2: var(--brand-2);
+  --color-brand-soft: var(--brand-soft);
+  --color-brand-ink: var(--brand-ink);
+  --color-on-brand: var(--on-brand);
+  --color-gold: var(--gold);
+  --color-gold-ink: var(--gold-ink);
+  --color-gold-soft: var(--gold-soft);
+  --color-danger: var(--danger);
+  --color-danger-strong: var(--danger-strong);
+  --color-danger-soft: var(--danger-soft);
+  --color-warn-soft: var(--warn-soft);
+  --color-warn-ink: var(--warn-ink);
+  --color-toast: var(--toast);
+  --shadow-card: var(--sh-1);
+  --shadow-float: var(--sh-2);
+  /* Empat radius baku: field 12 · tile 16 · card 22 · sheet 26 */
+  --radius-field: 12px;
+  --radius-tile: 16px;
+  --radius-card: 22px;
+  --radius-sheet: 26px;
+  --font-sans: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI Variable Text', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-arabic: var(--font-amiri), 'Amiri', 'Scheherazade New', 'Noto Naskh Arabic', 'Traditional Arabic', serif;
+}
+
+@layer base {
+  html {
+    background: var(--bg);
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    /* Hilangkan jeda 300 ms dan zoom ketuk-ganda saat mencentang beruntun. */
+    touch-action: manipulation;
+  }
+  /* iOS: ukuran teks dasar mengikuti Pengaturan → Tampilan → Ukuran Teks (Dynamic Type).
+     Semua ukuran memakai rem, jadi seluruh aplikasi ikut membesar. */
+  @supports (font: -apple-system-body) and (-webkit-touch-callout: none) {
+    html { font: -apple-system-body; }
+  }
+  body {
+    @apply bg-bg font-sans text-ink antialiased;
+    font-size: 1rem;
+    line-height: 1.45;
+    -webkit-tap-highlight-color: transparent;
+  }
+  /* Kontrol UI tidak bisa diseleksi/menu tekan-lama; teks bacaan (doa, kisah) tetap bisa disalin. */
+  button, nav, .chk, summary, .pill, a, img, [role='tab'] {
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+  }
+  button, summary, a, [role='tab'], .pill { cursor: pointer; }
+  input, textarea, select {
+    user-select: text;
+    -webkit-user-select: text;
+    /* Minimal 16px untuk mencegah iOS Safari melakukan auto-zoom saat fokus */
+    font-size: max(16px, 1rem) !important;
+  }
+  :focus-visible { outline: 2px solid var(--brand-2); outline-offset: 2px; }
+  /* Di HP, sembunyikan tab bar selama keyboard terbuka agar tidak menutupi form. */
+  @media (pointer: coarse) {
+    :root:has(input:not([type='checkbox']):not([type='radio']):focus, textarea:focus, select:focus) .tabbar { display: none; }
+  }
+}
+
+/* ---------- komponen yang butuh CSS murni (animasi, details, SVG) ---------- */
+@layer components {
+  .wsec::details-content { height: 0; overflow: clip; transition: height 0.32s cubic-bezier(0.2, 0.8, 0.2, 1), content-visibility 0.32s allow-discrete; }
+  .wsec[open]::details-content { height: auto; }
+  .wsec > summary { list-style: none; }
+  .wsec > summary::-webkit-details-marker { display: none; }
+  .wsec[open] .wsec-chev { transform: rotate(90deg); }
+
+  .wk-subuh { background: var(--w-subuh-bg); color: var(--w-subuh); }
+  .wk-pagi { background: var(--w-pagi-bg); color: var(--w-pagi); }
+  .wk-dzuhur { background: var(--w-dzuhur-bg); color: var(--w-dzuhur); }
+  .wk-ashar { background: var(--w-ashar-bg); color: var(--w-ashar); }
+  .wk-maghrib { background: var(--w-maghrib-bg); color: var(--w-maghrib); }
+  .wk-isya { background: var(--w-isya-bg); color: var(--w-isya); }
+  .wk-hari { background: var(--w-hari-bg); color: var(--w-hari); }
+
+  .sky-subuh { background: linear-gradient(180deg, #172447 0%, #33467c 58%, #b9807f 100%); }
+  .sky-pagi { background: linear-gradient(175deg, #2a74ad 0%, #4b95c8 55%, #d9a85a 125%); }
+  .sky-dzuhur { background: linear-gradient(175deg, #1b6f9c 0%, #2f8bbb 55%, #5aa8cc 100%); }
+  .sky-ashar { background: linear-gradient(175deg, #b5612f 0%, #cf7f43 55%, #e6a660 100%); }
+  .sky-maghrib { background: linear-gradient(180deg, #3a2a62 0%, #84406c 58%, #d4744e 100%); }
+  .sky-isya { background: linear-gradient(180deg, #0b1230 0%, #17235a 60%, #243472 100%); }
+  .star { fill: #fff; animation: twinkle 3.2s ease-in-out infinite; }
+
+  .tree-canopy { transform-origin: 80px 132px; animation: sway 7s ease-in-out infinite; }
+  .leaf { fill: color-mix(in srgb, var(--brand-2) 10%, transparent); stroke: var(--brand-2); stroke-opacity: 0.45; stroke-width: 0.8; stroke-dasharray: 1.6 1.6; }
+  .leaf.on { stroke: none; }
+  .leaf.c1 { fill: #2b6e48; } .leaf.c2 { fill: #3f8f5e; } .leaf.c3 { fill: #63b07a; }
+  .leaf.new, .fruit.new { transform-box: fill-box; transform-origin: center; animation: leafIn 0.7s cubic-bezier(0.3, 1.6, 0.5, 1) backwards; }
+  .fruit { fill: var(--gold); stroke: var(--surface); stroke-width: 1; }
+
+  /* Lingkaran centang 26px dengan area sentuh 44px (pseudo-element tak terlihat). */
+  .chk { position: relative; width: 26px; height: 26px; border-radius: 9999px; border: 2px solid var(--ink-4); display: grid; place-items: center; flex: none; transition: background 0.18s, border-color 0.18s, transform 0.12s; }
+  .chk::before { content: ''; position: absolute; inset: -9px; border-radius: 9999px; }
+  .chk::after { content: ''; width: 6px; height: 11px; border: solid var(--on-brand); border-width: 0 2.5px 2.5px 0; transform: rotate(45deg) scale(0); margin-top: -3px; transition: transform 0.2s cubic-bezier(0.3, 1.6, 0.5, 1); }
+  .chk[data-on='true'], .chk[aria-checked='true'] { background: var(--brand-2); border-color: var(--brand-2); }
+  .chk[data-on='true']::after, .chk[aria-checked='true']::after { transform: rotate(45deg) scale(1); }
+  .chk:active { transform: scale(0.85); }
+
+  /* Umpan balik tekan untuk baris/kartu yang bisa diketuk (hover tidak ada di HP). */
+  .pressable { transition: transform 0.12s ease, background-color 0.15s ease, opacity 0.15s ease; }
+  .pressable:active { transform: scale(0.985); background-color: color-mix(in srgb, var(--fill) 70%, transparent); }
+  /* Perluas area sentuh tanpa mengubah ukuran visual (min 44×44). */
+  .hit { position: relative; }
+  .hit::before { content: ''; position: absolute; left: 50%; top: 50%; width: max(100%, 44px); height: max(100%, 44px); transform: translate(-50%, -50%); }
+
+  .page-enter { animation: pageIn 0.32s cubic-bezier(0.2, 0.8, 0.2, 1); }
+  .skeleton { background: linear-gradient(90deg, var(--fill) 25%, color-mix(in srgb, var(--fill) 45%, transparent) 50%, var(--fill) 75%); background-size: 200% 100%; animation: shimmer 1.4s ease-in-out infinite; border-radius: 10px; }
+
+  .no-scrollbar { scrollbar-width: none; }
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  /* Deretan chip yang bisa digeser: pudar di tepi sebagai petunjuk ada lanjutan. */
+  .scroll-fade { mask-image: linear-gradient(90deg, transparent 0, #000 12px, #000 calc(100% - 24px), transparent 100%); }
+}
+
+@keyframes twinkle { 50% { opacity: 0.25; } }
+@keyframes sway { 0%, 100% { transform: rotate(-1.2deg); } 50% { transform: rotate(1.2deg); } }
+@keyframes leafIn { from { transform: scale(0); } }
+@keyframes pageIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+@keyframes sheetUp { from { transform: translateY(100%); } to { transform: none; } }
+@keyframes sheetDown { from { transform: none; } to { transform: translateY(100%); } }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
+@keyframes shimmer { from { background-position: 100% 0; } to { background-position: -100% 0; } }
+
+/* Animasi tak berujung dijeda saat aplikasi di latar belakang (hemat baterai HP kelas bawah). */
+:root[data-hidden] .star, :root[data-hidden] .tree-canopy, :root[data-hidden] .skeleton { animation-play-state: paused; }
+
+/* ---------- transisi antarhalaman (React ViewTransition) ---------- */
+::view-transition-old(.tab-fade) { animation: 120ms ease-out both fadeOut; }
+::view-transition-new(.tab-fade) { animation: 200ms ease-out 60ms both fadeIn, 260ms cubic-bezier(0.2, 0.8, 0.2, 1) both rise; }
+::view-transition-old(.hari-maju) { --slide: -48px; animation: 140ms ease-in both fadeOut, 300ms cubic-bezier(0.2, 0.8, 0.2, 1) both slideTo; }
+::view-transition-new(.hari-maju) { --slide: 48px; animation: 200ms ease-out 80ms both fadeIn, 300ms cubic-bezier(0.2, 0.8, 0.2, 1) both slideFrom; }
+::view-transition-old(.hari-mundur) { --slide: 48px; animation: 140ms ease-in both fadeOut, 300ms cubic-bezier(0.2, 0.8, 0.2, 1) both slideTo; }
+::view-transition-new(.hari-mundur) { --slide: -48px; animation: 200ms ease-out 80ms both fadeIn, 300ms cubic-bezier(0.2, 0.8, 0.2, 1) both slideFrom; }
+@keyframes rise { from { transform: translateY(8px); } }
+@keyframes slideFrom { from { translate: var(--slide); } to { translate: 0; } }
+@keyframes slideTo { from { translate: 0; } to { translate: var(--slide); } }
+
+/* ---------- perayaan, toast, majelis malam ---------- */
+.confetti { position: fixed; left: 50%; top: 58%; z-index: 70; pointer-events: none; }
+.confetti span { position: absolute; font-size: 22px; animation: burst 1.5s cubic-bezier(0.2, 0.7, 0.3, 1) forwards; }
+@keyframes burst {
+  0% { transform: translate(0, 0) scale(0.3); opacity: 0; }
+  10% { opacity: 1; }
+  45% { transform: translate(calc(var(--x) * 0.7), var(--y)) rotate(calc(var(--r) * 0.5)) scale(1); opacity: 1; }
+  100% { transform: translate(var(--x), calc(var(--y) + 320px)) rotate(var(--r)) scale(0.9); opacity: 0; }
+}
+@keyframes toastIn { from { opacity: 0; transform: translateY(10px) scale(0.95); } to { opacity: 1; transform: none; } }
+.mm-bg { background: radial-gradient(120% 80% at 50% 0%, #34296a 0%, #161335 58%, #0b0a1d 100%); }
+
+/* Hormati "Kurangi gerakan": semua animasi & transisi dipersingkat menjadi instan. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; }
+}

@@ -1,20 +1,14 @@
-import { test, expect, Page } from '@playwright/test'
+import { expect, test } from '@playwright/test'
 
 test.describe('Frontend', () => {
-  let page: Page
-
-  test.beforeAll(async ({ browser }, testInfo) => {
-    const context = await browser.newContext()
-    page = await context.newPage()
+  test('halaman sambutan tampil', async ({ page }) => {
+    await page.goto('http://localhost:3000')
+    await expect(page).toHaveTitle(/Pohon Baik/)
+    await expect(page.locator('h1').first()).toHaveText("Assalamu'alaikum")
   })
 
-  test('can go on homepage', async ({ page }) => {
-    await page.goto('http://localhost:3000')
-
-    await expect(page).toHaveTitle(/Payload Blank Template/)
-
-    const heading = page.locator('h1').first()
-
-    await expect(heading).toHaveText('Welcome to your new project.')
+  test('rute aplikasi tanpa sesi diarahkan ke halaman masuk', async ({ page }) => {
+    await page.goto('http://localhost:3000/hari-ini')
+    await expect(page).toHaveURL(/\/masuk$/)
   })
 })
