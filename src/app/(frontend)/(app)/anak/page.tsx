@@ -22,7 +22,7 @@ import {
   getBranchList,
   getWarnings,
 } from '@/lib/server/content'
-import { PRICE_PER_CHILD_YEAR } from '@/lib/billing/rules'
+import { addYears, PRICE_PER_CHILD_YEAR } from '@/lib/billing/rules'
 import { childOpenOn } from '@/lib/server/billing'
 import { sleepPrayer } from '@/lib/server/day'
 import { getFamily, getParent, payloadClient } from '@/lib/server/payload'
@@ -101,6 +101,8 @@ export default async function AnakPage({
   const daysLived = Math.max(0, daysBetween(activeChild.dob, today)) + 1
   const nbDate = nextBirthday(activeChild.dob, today)
   const daysToNextBirthday = Math.max(0, daysBetween(today, nbDate))
+  // Awal tahun usia berjalan (ulang tahun terakhir), untuk "Kenang bersama".
+  const lastBirthday = nbDate === today ? today : addYears(nbDate, -1) < activeChild.dob ? activeChild.dob : addYears(nbDate, -1)
 
   // Semester perhitungan rapor
   const defaultSemester = `${today.slice(0, 4)}-S${Number(today.slice(5, 7)) <= 6 ? 1 : 2}`
@@ -142,10 +144,11 @@ export default async function AnakPage({
       where: {
         and: [{ family: { equals: family.id } }, { child: { equals: activeChild.id } }],
       },
-      limit: 100,
+      // Cukup untuk "Kenang bersama" sejak ulang tahun terakhir.
+      limit: 300,
       pagination: false,
       sort: '-date',
-      depth: 0,
+      depth: 1,
       overrideAccess: false,
       user: parent,
     }),
@@ -231,7 +234,7 @@ export default async function AnakPage({
 
   // Band & targets
   const currentBand = bandOf(bands, months)
-  const targets = (currentBand.targets ?? []).map((t) => (typeof t === 'string' ? t : t.text))
+  const targets = (currentBand.targets ?? []).map((t, i) => ({ key: `t-${currentBand.code}-${i}`, text: typeof t === 'string' ? t : t.text }))
 
   const kurikulum = await payload.findGlobal({ slug: 'kurikulum', depth: 0 }).catch(() => null)
   const load = activeChild.load ?? 'seimbang'
@@ -294,6 +297,8 @@ export default async function AnakPage({
         childrenList={children.map((c) => ({ id: c.id, name: c.name }))}
         daysLived={daysLived}
         daysToNextBirthday={daysToNextBirthday}
+        lastBirthday={lastBirthday}
+        ageYears={Math.floor(months / 12)}
         profile={profileData}
         nextProfile={nextProfileData}
         milestonesDone={milestonesDone}
@@ -302,6 +307,8 @@ export default async function AnakPage({
           date: m.date,
           category: m.category as MomentCategory,
           text: m.text ?? '',
+          effort: m.effort ?? null,
+          photo: m.photo && typeof m.photo === 'object' && m.photo.url ? { url: m.photo.url, thumb: m.photo.sizes?.thumb?.url ?? m.photo.url } : null,
           source: m.source ?? 'manual',
           milestoneKey: m.milestoneKey ?? null,
           hasPhoto: !!m.hasPhoto,

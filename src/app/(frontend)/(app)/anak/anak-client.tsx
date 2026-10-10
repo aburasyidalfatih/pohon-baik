@@ -8,11 +8,11 @@ import { createContext, startTransition, useContext, useMemo, useOptimistic, use
 import { ChildSwitcher, kidColor, Segmented } from '@/components/pb/ui'
 import { Button } from '@/components/ui/primitives'
 import { MomentSheet } from './moment-sheet'
-import { ANAK_TABS, toAnakTab, type AnakTab } from './types'
+import { ANAK_TABS, toAnakTab, type AnakTab, type MomentPreset } from './types'
 
-const AnakCtx = createContext<{ openMoment: () => void } | null>(null)
+const AnakCtx = createContext<{ openMoment: (preset?: MomentPreset) => void } | null>(null)
 
-function useAnak() {
+export function useAnak() {
   const c = useContext(AnakCtx)
   if (!c) throw new Error('useAnak harus dipakai di dalam <AnakProvider>')
   return c
@@ -30,11 +30,18 @@ export function AnakProvider({
   children: ReactNode
 }) {
   const [open, setOpen] = useState(false)
-  const value = useMemo(() => ({ openMoment: () => setOpen(true) }), [])
+  // Form diatur ulang (nomor baru) saat preset berganti ke/dari target atau lengkapi; draf "catat baru" tetap tersimpan.
+  const [preset, setPreset] = useState<{ n: number; p: MomentPreset }>({ n: 0, p: { mode: 'new' } })
+  const value = useMemo(() => ({
+    openMoment: (p: MomentPreset = { mode: 'new' }) => {
+      setPreset((cur) => ({ n: p.mode === 'new' && cur.p.mode === 'new' ? cur.n : cur.n + 1, p }))
+      setOpen(true)
+    },
+  }), [])
   return (
     <AnakCtx.Provider value={value}>
       {children}
-      <MomentSheet open={open} onClose={() => setOpen(false)} childId={childId} childName={childName} today={today} />
+      <MomentSheet key={preset.n} open={open} onClose={() => setOpen(false)} childId={childId} childName={childName} today={today} preset={preset.p} />
     </AnakCtx.Provider>
   )
 }
@@ -56,7 +63,7 @@ export function KidAvatar({ index, name }: { index: number; name: string }) {
 export function CatatMomenButton() {
   const { openMoment } = useAnak()
   return (
-    <Button variant="soft" size="icon" onClick={openMoment} aria-label="Catat momen">
+    <Button variant="soft" size="icon" onClick={() => openMoment()} aria-label="Catat momen">
       <PenLine size={18} aria-hidden />
     </Button>
   )
@@ -68,7 +75,7 @@ export function CatatMomenCard({ childName }: { childName: string }) {
   return (
     <button
       type="button"
-      onClick={openMoment}
+      onClick={() => openMoment()}
       className="pressable flex w-full items-center gap-3.5 rounded-card bg-surface p-4 text-left shadow-card"
     >
       <span className="grid size-11 flex-none place-items-center rounded-tile bg-brand-soft text-brand" aria-hidden>

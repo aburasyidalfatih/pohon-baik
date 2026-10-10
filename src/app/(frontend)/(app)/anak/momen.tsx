@@ -1,6 +1,6 @@
 'use client'
 
-import { Camera, Sparkles, Trash2 } from 'lucide-react'
+import { Camera, PenLine, Sparkles, Trash2 } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { haptic } from '@/components/pb/celebrate'
 import { useToast } from '@/components/pb/feedback'
@@ -9,6 +9,7 @@ import { pesanGalat } from '@/lib/errors'
 import { fmtDate } from '@/lib/format'
 import { cn } from '@/lib/utils'
 import { deleteMoment } from './actions'
+import { useAnak } from './anak-client'
 import { MOMENT_CATS, type Moment, type MomentCategory } from './types'
 
 const UNDO_MS = 5000
@@ -23,6 +24,7 @@ const FILTERS: { key: 'all' | MomentCategory; label: string; emoji: string }[] =
  */
 export function MomenList({ moments }: { moments: Moment[] }) {
   const toast = useToast()
+  const { openMoment } = useAnak()
   const [filter, setFilter] = useState<'all' | MomentCategory>('all')
   const [hidden, setHidden] = useState<ReadonlySet<string>>(() => new Set())
   const timers = useRef(new Map<string, ReturnType<typeof setTimeout>>())
@@ -125,6 +127,17 @@ export function MomenList({ moments }: { moments: Moment[] }) {
                       {fmtDate(m.date)}
                     </time>
                   </div>
+                  <span className="flex flex-none">
+                  {m.source !== 'majelis' && (
+                    <button
+                      type="button"
+                      onClick={() => openMoment({ mode: 'edit', moment: m })}
+                      aria-label={`Lengkapi momen ${fmtDate(m.date)}: cerita, usaha, foto`}
+                      className="grid size-11 flex-none place-items-center rounded-full text-ink-3 transition active:scale-95 active:bg-fill"
+                    >
+                      <PenLine size={18} aria-hidden />
+                    </button>
+                  )}
                   <button
                     type="button"
                     onClick={() => remove(m)}
@@ -133,18 +146,35 @@ export function MomenList({ moments }: { moments: Moment[] }) {
                   >
                     <Trash2 size={18} aria-hidden />
                   </button>
+                  </span>
                 </div>
                 <p className="pr-2.5 pb-2 text-[0.9375rem] leading-relaxed whitespace-pre-line text-ink">{m.text}</p>
-                {(m.source === 'milestone' || m.hasPhoto) && (
+                {m.effort && (
+                  <p className="mr-2.5 mb-2 rounded-tile bg-gold-soft px-3 py-2 text-[0.875rem] text-gold-ink">
+                    <b>Usahanya:</b> {m.effort}
+                  </p>
+                )}
+                {m.photo && (
+                  <a href={m.photo.url} target="_blank" rel="noopener" className="mr-2.5 mb-2 block w-fit">
+                    {/* eslint-disable-next-line @next/next/no-img-element -- berkas privat lewat endpoint ber-cookie */}
+                    <img src={m.photo.thumb} alt={`Foto momen ${fmtDate(m.date)}`} loading="lazy" className="max-h-56 rounded-tile object-cover" />
+                  </a>
+                )}
+                {(m.source === 'milestone' || m.source === 'target' || (m.hasPhoto && !m.photo)) && (
                   <div className="flex flex-wrap gap-1.5 pb-2">
                     {m.source === 'milestone' && (
                       <span className="rounded-md bg-brand-soft px-1.5 py-0.5 text-[0.6875rem] font-semibold text-brand">
                         Dari tonggak kemampuan
                       </span>
                     )}
-                    {m.hasPhoto && (
+                    {m.source === 'target' && (
+                      <span className="rounded-md bg-gold-soft px-1.5 py-0.5 text-[0.6875rem] font-semibold text-gold-ink">
+                        <span aria-hidden>🏅</span> Target capaian tercapai
+                      </span>
+                    )}
+                    {m.hasPhoto && !m.photo && (
                       <span className="inline-flex items-center gap-1 rounded-md bg-fill px-1.5 py-0.5 text-[0.6875rem] font-semibold text-ink-2">
-                        <Camera size={12} aria-hidden /> Ada foto
+                        <Camera size={12} aria-hidden /> Ada foto di cadangan lama
                       </span>
                     )}
                   </div>

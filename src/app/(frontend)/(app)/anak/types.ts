@@ -27,10 +27,24 @@ export type Moment = {
   date: string
   category: MomentCategory
   text: string
+  /** Usaha/proses anak (pujian proses). */
+  effort?: string | null
   source: string
   milestoneKey?: string | null
+  /** Foto privat: URL berkas penuh dan versi kecil (dilayani hanya untuk keluarga ini). */
+  photo?: { url: string; thumb: string } | null
+  /** Momen hasil impor prototype yang dulu punya foto (berkasnya tidak ikut diunggah). */
   hasPhoto?: boolean
 }
+
+/** Isi awal lembar momen: catat baru, tandai target tercapai, atau lengkapi momen lama. */
+export type MomentPreset =
+  | { mode: 'new' }
+  | { mode: 'target'; key: string; text: string }
+  | { mode: 'edit'; moment: Moment }
+
+/** Target capaian kelompok usia; `key` = `t-<kode kelompok>-<urutan>`. */
+export type TargetItem = { key: string; text: string }
 
 export type MilestoneGroup = { label: string; items: { key: string; text: string }[] }
 
@@ -68,7 +82,7 @@ export type Pustaka = {
   slotIlmu: string
   sleep: { jam: string; pukul: string; catatan?: string }
   screen: string
-  targets: string[]
+  targets: TargetItem[]
   modulesByLapis: Record<
     string,
     {

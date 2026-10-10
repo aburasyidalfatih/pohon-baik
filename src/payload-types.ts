@@ -87,6 +87,7 @@ export interface Config {
     moments: Moment;
     milestones: Milestone;
     raporEntries: RaporEntry;
+    momentPhotos: MomentPhoto;
     orders: Order;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
@@ -114,6 +115,7 @@ export interface Config {
     moments: MomentsSelect<false> | MomentsSelect<true>;
     milestones: MilestonesSelect<false> | MilestonesSelect<true>;
     raporEntries: RaporEntriesSelect<false> | RaporEntriesSelect<true>;
+    momentPhotos: MomentPhotosSelect<false> | MomentPhotosSelect<true>;
     orders: OrdersSelect<false> | OrdersSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
@@ -655,11 +657,42 @@ export interface Moment {
   date: string;
   category: 'bisa' | 'kata' | 'ibadah' | 'lucu' | 'syukur' | 'catatan';
   text?: string | null;
-  source: 'manual' | 'milestone' | 'majelis';
+  effort?: string | null;
+  photo?: (string | null) | MomentPhoto;
+  source: 'manual' | 'milestone' | 'target' | 'majelis';
   milestoneKey?: string | null;
   hasPhoto?: boolean | null;
   updatedAt: string;
   createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "momentPhotos".
+ */
+export interface MomentPhoto {
+  id: string;
+  family: string | Family;
+  updatedAt: string;
+  createdAt: string;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
+  focalX?: number | null;
+  focalY?: number | null;
+  sizes?: {
+    thumb?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+  };
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -825,6 +858,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'raporEntries';
         value: string | RaporEntry;
+      } | null)
+    | ({
+        relationTo: 'momentPhotos';
+        value: string | MomentPhoto;
       } | null)
     | ({
         relationTo: 'orders';
@@ -1245,6 +1282,8 @@ export interface MomentsSelect<T extends boolean = true> {
   date?: T;
   category?: T;
   text?: T;
+  effort?: T;
+  photo?: T;
   source?: T;
   milestoneKey?: T;
   hasPhoto?: T;
@@ -1276,6 +1315,38 @@ export interface RaporEntriesSelect<T extends boolean = true> {
   note?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "momentPhotos_select".
+ */
+export interface MomentPhotosSelect<T extends boolean = true> {
+  family?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  url?: T;
+  thumbnailURL?: T;
+  filename?: T;
+  mimeType?: T;
+  filesize?: T;
+  width?: T;
+  height?: T;
+  focalX?: T;
+  focalY?: T;
+  sizes?:
+    | T
+    | {
+        thumb?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+      };
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

@@ -29,7 +29,9 @@ import { CRISIS_CONTACTS, WAKTU, type Waktu } from '@/lib/curriculum/constants'
 import { cn } from '@/lib/utils'
 import { AnakChildPicker, AnakProvider, AnakTabs, CatatMomenButton, CatatMomenCard, KidAvatar } from './anak-client'
 import { MilestoneChecklist } from './milestones'
+import { KenangBersama } from './kenang'
 import { MomenList } from './momen'
+import { TargetChecklist } from './targets'
 import { RaporPanel } from './rapor'
 import { LAPIS, type AgeProfile, type Branch, type MilestoneGroup, type Moment, type NextAgeProfile, type Pustaka, type RaporMap } from './types'
 
@@ -40,6 +42,9 @@ export type AnakViewProps = {
   childrenList: { id: string; name: string }[]
   daysLived: number
   daysToNextBirthday: number
+  /** Awal tahun usia berjalan dan usia (tahun), untuk "Kenang bersama". */
+  lastBirthday: string
+  ageYears: number
   profile: AgeProfile | null
   nextProfile: NextAgeProfile | null
   milestonesDone: Record<string, string>
@@ -64,6 +69,7 @@ export function AnakView(p: AnakViewProps) {
           momen: (
             <>
               <CatatMomenCard childName={child.name} />
+              <KenangBersama moments={p.moments} childName={child.name} today={p.today} lastBirthday={p.lastBirthday} ageYears={p.ageYears} />
               <MomenList moments={p.moments} />
             </>
           ),
@@ -207,6 +213,12 @@ function KenaliPanel({ profile, nextProfile, activeChild, today, milestonesDone,
           {groups.length > 0 && (
             <Section icon={Sprout} title="Tonggak kemampuan">
               <MilestoneChecklist childId={activeChild.id} today={today} groups={groups} done={milestonesDone} />
+            </Section>
+          )}
+
+          {pustaka.targets.length > 0 && (
+            <Section icon={Target} title="Target capaian usia">
+              <TargetChecklist childId={activeChild.id} childName={activeChild.name} targets={pustaka.targets} done={milestonesDone} />
             </Section>
           )}
 
@@ -362,22 +374,6 @@ function ModulPanel({ pustaka }: { pustaka: Pustaka }) {
         ))}
       </section>
 
-      {pustaka.targets.length > 0 && (
-        <section className="rounded-card bg-brand-soft p-4 shadow-card">
-          <h3 className="mb-2 flex items-center gap-2 text-[0.9375rem] font-bold text-brand-ink">
-            <Target size={18} aria-hidden className="flex-none" />
-            Target capaian usia
-          </h3>
-          <ul className="space-y-1 text-[0.8125rem] text-brand-ink">
-            {pustaka.targets.map((t, i) => (
-              <li key={i} className="flex items-start gap-1.5">
-                <span aria-hidden>•</span>
-                <span>{t}</span>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
 
       {LAPIS.map((lapis) => {
         const list = pustaka.modulesByLapis[lapis] ?? []

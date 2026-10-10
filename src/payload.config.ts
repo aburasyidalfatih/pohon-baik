@@ -14,6 +14,7 @@ import { Children, Families, Parents } from './collections/family'
 import { Kurikulum } from './globals/Kurikulum'
 import { trackingCollections } from './collections/tracking'
 import { Orders } from './collections/billing'
+import { MomentPhotos } from './collections/photos'
 import { migrations } from './migrations'
 
 // Push skema otomatis hanya untuk database lokal saat pengembangan. Database server selalu lewat migrasi,
@@ -33,7 +34,7 @@ export default buildConfig({
     suppressHydrationWarning: true,
   },
   i18n: { supportedLanguages: { id, en }, fallbackLanguage: 'id' },
-  collections: [...contentCollections, Media, Users, Parents, Families, Children, ...trackingCollections, Orders],
+  collections: [...contentCollections, Media, Users, Parents, Families, Children, ...trackingCollections, MomentPhotos, Orders],
   globals: [Kurikulum],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',

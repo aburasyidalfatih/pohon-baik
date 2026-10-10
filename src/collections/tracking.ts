@@ -109,12 +109,45 @@ export const Moments = familyOwned({
       { label: '😄 Lucu', value: 'lucu' }, { label: '💛 Syukur', value: 'syukur' }, { label: '📝 Catatan', value: 'catatan' },
     ] },
     { name: 'text', label: 'Cerita', type: 'textarea' },
+    // Pujian proses: usaha/strategi anak, bukan "pintar" (Mueller & Dweck 1998; Gunderson dkk. 2013).
+    { name: 'effort', label: 'Usahanya', type: 'textarea' },
+    { name: 'photo', label: 'Foto', type: 'upload', relationTo: 'momentPhotos' },
     { name: 'source', label: 'Asal', type: 'select', required: true, defaultValue: 'manual', options: [
-      { label: 'Ditulis orang tua', value: 'manual' }, { label: 'Tonggak kemampuan', value: 'milestone' }, { label: 'Majelis Malam', value: 'majelis' },
+      { label: 'Ditulis orang tua', value: 'manual' }, { label: 'Tonggak kemampuan', value: 'milestone' },
+      { label: 'Target capaian', value: 'target' }, { label: 'Majelis Malam', value: 'majelis' },
     ] },
-    { name: 'milestoneKey', type: 'text', index: true, admin: { condition: (_, s) => s?.source === 'milestone' } },
-    { name: 'hasPhoto', label: 'Ada foto (menyusul: unggahan privat)', type: 'checkbox', defaultValue: false },
+    { name: 'milestoneKey', type: 'text', index: true, admin: { condition: (_, s) => s?.source === 'milestone' || s?.source === 'target' } },
+    { name: 'hasPhoto', label: 'Ada foto di cadangan prototype (berkas tidak diunggah)', type: 'checkbox', defaultValue: false },
   ],
+  hooks: {
+    beforeChange: [
+      // Foto harus milik keluarga yang sama (mencegah menautkan, lalu ikut menghapus, foto keluarga lain).
+      async ({ data, originalDoc, req }) => {
+        const photo = data.photo ?? originalDoc?.photo
+        const id = photo && typeof photo === 'object' ? photo.id : photo
+        if (!id) return data
+        const p = await req.payload.findByID({ collection: 'momentPhotos', id, depth: 0, req, overrideAccess: true }).catch(() => null)
+        const fam = (f: unknown) => String(f && typeof f === 'object' ? (f as { id: string }).id : f)
+        if (!p || fam(p.family) !== fam(data.family ?? originalDoc?.family)) throw new Error('Foto tidak sesuai')
+        return data
+      },
+    ],
+    // Foto ikut terhapus bersama momennya, atau saat diganti/dilepas.
+    afterDelete: [
+      async ({ doc, req }) => {
+        const id = doc.photo && typeof doc.photo === 'object' ? doc.photo.id : doc.photo
+        if (id) await req.payload.delete({ collection: 'momentPhotos', id, req, overrideAccess: true }).catch(() => {})
+      },
+    ],
+    afterChange: [
+      async ({ doc, previousDoc, req, operation }) => {
+        if (operation !== 'update') return
+        const was = previousDoc?.photo && typeof previousDoc.photo === 'object' ? previousDoc.photo.id : previousDoc?.photo
+        const now = doc.photo && typeof doc.photo === 'object' ? doc.photo.id : doc.photo
+        if (was && was !== now) await req.payload.delete({ collection: 'momentPhotos', id: was, req, overrideAccess: true }).catch(() => {})
+      },
+    ],
+  },
 })
 
 export const Milestones = familyOwned({
