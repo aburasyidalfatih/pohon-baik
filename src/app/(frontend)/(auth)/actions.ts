@@ -32,11 +32,15 @@ export async function signIn(_: AuthState, fd: FormData): Promise<AuthState> {
     return {
       error: locked ? 'Terlalu banyak percobaan. Coba lagi 10 menit lagi, atau atur ulang kata sandi.' : 'Email atau kata sandi salah.',
       field: 'password',
-      values: { email },
+      values: { email, lanjut: str(fd, 'lanjut') },
     }
   }
-  redirect('/hari-ini')
+  redirect(safeNext(str(fd, 'lanjut')))
 }
+
+/** Tujuan setelah masuk: hanya jalur internal yang dikenal (mencegah open redirect). */
+// Bukan export: file 'use server' hanya boleh mengekspor fungsi async (server action).
+const safeNext = (v: string) => (/^\/gabung\/[\w-]{10,64}$/.test(v) ? v : '/hari-ini')
 
 export async function signUp(_: AuthState, fd: FormData): Promise<AuthState> {
   const values = {

@@ -24,6 +24,18 @@ Dokploy → **Create Service → Application**.
 | `MIDTRANS_SERVER_KEY` | Server key dari dashboard Midtrans (Settings → Access Keys). Wajib untuk menerima pembayaran langganan |
 | `MIDTRANS_IS_PRODUCTION` | `true` untuk akun production, `false` untuk sandbox |
 | `MIDTRANS_ENABLED_PAYMENTS` | Opsional. Disarankan `other_qris,gopay,shopeepay` agar biaya transaksi Rp25.000 tetap kecil |
+| `RESEND_API_KEY`, `EMAIL_FROM`, `EMAIL_FROM_NAME` | Email atur ulang sandi dan undangan keluarga. Tanpa kunci, email hanya tercetak di log (fitur "Lupa kata sandi" tidak berfungsi bagi pengguna) |
+| `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT` | Pengingat waktu shalat. Buat sekali dengan `npx web-push generate-vapid-keys`; jangan diganti setelah ada pengguna (langganan lama tidak berlaku) |
+| `CRON_SECRET` | Rahasia pemanggil `/cron/prayer-push` (`openssl rand -hex 32`) |
+
+### Jadwal pengingat waktu shalat
+Dokploy → aplikasi → **Schedules** (atau cron di VPS), setiap 5 menit (`*/5 * * * *`):
+
+```bash
+curl -fsS -H "Authorization: Bearer $CRON_SECRET" https://domain-anda/cron/prayer-push
+```
+
+Aman dipanggil berulang: setiap perangkat menerima satu pengingat per waktu shalat (dalam 40 menit setelah waktu masuk).
 
 ### Midtrans
 Di dashboard Midtrans → **Settings → Payment → Notification URL**, isi `https://domain-anda/webhooks/midtrans`. Notifikasi diverifikasi dengan tanda tangan SHA-512 lalu dicocokkan ulang ke API status Midtrans. Uji dulu dengan akun sandbox.

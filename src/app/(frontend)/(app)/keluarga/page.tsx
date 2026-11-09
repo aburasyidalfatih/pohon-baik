@@ -3,6 +3,8 @@ import { PageTransition } from '@/components/pb/page-transition'
 import { localNow } from '@/lib/curriculum/core'
 import { rupiah } from '@/lib/billing/rules'
 import { billingFor } from '@/lib/server/billing'
+import { familyMembers, pendingInvites } from '@/lib/server/invites'
+import { vapidPublicKey } from '@/lib/server/push'
 import { getBranchList, getThemes } from '@/lib/server/content'
 import { getFamily, getParent } from '@/lib/server/payload'
 import { signOut } from '../../(auth)/actions'
@@ -18,6 +20,8 @@ export default async function KeluargaPage() {
   const tz = Number(family.tz ?? 7)
   const today = localNow(tz).date
 
+  const s = { parent, ...ctx }
+  const [members, invites] = await Promise.all([familyMembers(s), pendingInvites(s)])
   const b = billingFor(ctx)
   const billing =
     b.locked.length ? { summary: `${b.locked.length} anak belum aktif · ${rupiah(b.price)}/anak/tahun`, attention: true }
@@ -30,6 +34,9 @@ export default async function KeluargaPage() {
       <KeluargaView
         today={today}
         billing={billing}
+        vapidKey={vapidPublicKey()}
+        members={members}
+        invites={invites}
         themes={themes.map((t) => ({ order: t.order, title: t.title, surah: t.surah }))}
         parent={{
           id: parent.id,

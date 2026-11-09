@@ -59,6 +59,9 @@ export const Families: CollectionConfig = {
       label: 'Anggota',
       type: 'array',
       minRows: 1,
+      // Anggota hanya diubah server (daftar, terima undangan, keluarkan anggota) atau staf, bukan lewat API orang tua:
+      // mencegah orang tua memasukkan akun orang lain ke keluarganya.
+      access: billingStaff,
       fields: [
         { name: 'parent', type: 'relationship', relationTo: 'parents', required: true, index: true },
         { name: 'role', type: 'select', required: true, defaultValue: 'parent', options: [

@@ -29,6 +29,8 @@ export function PrivacyContent({ compact = false }: { compact?: boolean }) {
         <li><b>Hafalan Qur&apos;an:</b> surah/bagian yang disetor dan jadwal murajaah yang sudah dikerjakan.</li>
         <li><b>Momen &amp; foto:</b> cerita, usaha anak yang Anda tulis, kategori, dan tanggal momen. Foto yang Anda pilih diperkecil di HP, lalu diproses ulang di server sehingga metadata (termasuk lokasi GPS) terhapus. Foto disimpan privat, hanya bisa dibuka anggota keluarga Anda, dan ikut terhapus bila momennya dihapus. Cadangan .json belum memuat berkas foto.</li>
         <li><b>Target capaian:</b> target usia yang Anda tandai tercapai beserta tanggalnya.</li>
+        <li><b>Anggota dan undangan keluarga:</b> siapa saja anggota keluarga beserta perannya, serta undangan yang dibuat (peran, email tujuan bila diisi, masa berlaku). Anggota yang Anda undang bisa melihat dan mencatat semua data anak di keluarga ini.</li>
+        <li><b>Pengingat waktu shalat:</b> bila Anda menyalakannya, alamat langganan notifikasi perangkat (dari layanan push browser) dan jenis perangkat. Isi pengingat memuat nama panggilan anak dan judul tugas, dan bisa tampil di layar kunci HP. Langganan dihapus saat Anda mematikannya atau keluar akun di perangkat itu.</li>
         <li><b>Tonggak kemampuan dan rapor:</b> kemampuan yang sudah tampak beserta tanggalnya, serta tingkat dan catatan rapor per semester.</li>
         <li><b>Langganan dan pembayaran:</b> tanggal akhir masa coba, masa aktif langganan tiap anak, pesanan (nomor, anak yang dibayar, jumlah, status, metode bayar), dan permohonan keringanan beserta alasan yang Anda tulis. Pembayaran diproses oleh Midtrans; nomor kartu, PIN, atau saldo e-wallet tidak pernah kami terima atau simpan.</li>
       </ul>
@@ -38,7 +40,7 @@ export function PrivacyContent({ compact = false }: { compact?: boolean }) {
         <li>Menyusun tugas harian, materi, dan tema yang sesuai usia setiap anak.</li>
         <li>Menghitung waktu shalat dan tanggal sesuai lokasi keluarga.</li>
         <li>Menampilkan perkembangan anak (hafalan, momen, rapor) hanya kepada anggota keluarga Anda.</li>
-        <li>Mengirim email yang Anda minta, misalnya tautan atur ulang kata sandi.</li>
+        <li>Mengirim email yang Anda minta, misalnya tautan atur ulang kata sandi atau undangan keluarga (lewat layanan email Resend).</li>
         <li>Memproses langganan: mengirim nama, email, nomor pesanan, dan jumlah ke Midtrans untuk membuat halaman bayar, lalu mencatat status pembayaran.</li>
       </ul>
 

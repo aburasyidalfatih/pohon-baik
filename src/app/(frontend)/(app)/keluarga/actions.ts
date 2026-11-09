@@ -6,6 +6,7 @@ import { CITIES, DEFAULT_LOAD, DEFAULT_TAHFIDZ, LOADS, TAHFIDZ_TARGETS, type Loa
 import { localNow } from '@/lib/curriculum/core'
 import { getFamily, getParent, payloadClient } from '@/lib/server/payload'
 import { THEME_COOKIE } from '@/lib/theme'
+import { createInvite, removeMember } from '@/lib/server/invites'
 import type { Family } from '@/payload-types'
 
 const validLoad = (v?: string): Load => (LOADS.some((l) => l.id === v) ? (v as Load) : DEFAULT_LOAD)
@@ -238,4 +239,52 @@ export async function exportBackupJson(): Promise<string> {
   }
 
   return JSON.stringify(backupObj, null, 2)
+}
+
+// ---------- Notifikasi waktu shalat (per perangkat) ----------
+
+export async function savePushSubscription(sub: { endpoint: string; keys: { p256dh: string; auth: string } }, device: string) {
+  const s = await session()
+  if (!/^https:\/\//.test(sub?.endpoint ?? '') || !sub.keys?.p256dh || !sub.keys?.auth) throw new Error('Langganan notifikasi tidak valid')
+  const payload = await payloadClient()
+  const data = { parent: s.parent.id, family: s.family.id, endpoint: sub.endpoint, keys: { p256dh: sub.keys.p256dh, auth: sub.keys.auth }, device: device.slice(0, 120) }
+  const found = await payload.find({ collection: 'pushSubscriptions', where: { endpoint: { equals: sub.endpoint } }, limit: 1, depth: 0, overrideAccess: true })
+  if (found.docs[0]) await payload.update({ collection: 'pushSubscriptions', id: found.docs[0].id, data, overrideAccess: true })
+  else await payload.create({ collection: 'pushSubscriptions', data, overrideAccess: true })
+}
+
+/** Hapus langganan perangkat ini. Tidak memerlukan sesi agar tetap bisa dipanggil saat keluar akun. */
+export async function deletePushSubscription(endpoint: string) {
+  if (!endpoint) return
+  const payload = await payloadClient()
+  await payload.delete({ collection: 'pushSubscriptions', where: { endpoint: { equals: endpoint } }, overrideAccess: true })
+}
+
+// ---------- Anggota keluarga & undangan ----------
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+export async function inviteMember(role: 'parent' | 'caregiver', email: string): Promise<{ url?: string; error?: string }> {
+  const s = await session().catch(() => null)
+  if (!s) return { error: 'Sesi berakhir, silakan masuk lagi' }
+  const mail = email.trim().toLowerCase()
+  if (mail && !EMAIL_RE.test(mail)) return { error: 'Tulis email yang valid, atau kosongkan.' }
+  const url = await createInvite(s, role === 'caregiver' ? 'caregiver' : 'parent', mail || undefined)
+  revalidatePath('/keluarga')
+  return { url }
+}
+
+export async function revokeInvite(id: string) {
+  const s = await session()
+  const payload = await payloadClient()
+  await payload.delete({ collection: 'familyInvites', where: { and: [{ id: { equals: id } }, { family: { equals: s.family.id } }] }, overrideAccess: false, user: s.parent })
+  revalidatePath('/keluarga')
+}
+
+export async function kickMember(memberId: string): Promise<{ error?: string }> {
+  const s = await session().catch(() => null)
+  if (!s) return { error: 'Sesi berakhir, silakan masuk lagi' }
+  const r = await removeMember(s, memberId)
+  revalidatePath('/keluarga')
+  return r
 }

@@ -88,6 +88,8 @@ export interface Config {
     milestones: Milestone;
     raporEntries: RaporEntry;
     momentPhotos: MomentPhoto;
+    pushSubscriptions: PushSubscription;
+    familyInvites: FamilyInvite;
     orders: Order;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
@@ -116,6 +118,8 @@ export interface Config {
     milestones: MilestonesSelect<false> | MilestonesSelect<true>;
     raporEntries: RaporEntriesSelect<false> | RaporEntriesSelect<true>;
     momentPhotos: MomentPhotosSelect<false> | MomentPhotosSelect<true>;
+    pushSubscriptions: PushSubscriptionsSelect<false> | PushSubscriptionsSelect<true>;
+    familyInvites: FamilyInvitesSelect<false> | FamilyInvitesSelect<true>;
     orders: OrdersSelect<false> | OrdersSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
@@ -724,6 +728,46 @@ export interface RaporEntry {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pushSubscriptions".
+ */
+export interface PushSubscription {
+  id: string;
+  parent: string | Parent;
+  family: string | Family;
+  endpoint: string;
+  keys:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  device?: string | null;
+  lastSent?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "familyInvites".
+ */
+export interface FamilyInvite {
+  id: string;
+  family: string | Family;
+  token: string;
+  role: 'parent' | 'caregiver';
+  email?: string | null;
+  createdBy?: (string | null) | Parent;
+  expiresAt: string;
+  usedBy?: (string | null) | Parent;
+  usedAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "orders".
  */
 export interface Order {
@@ -862,6 +906,14 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'momentPhotos';
         value: string | MomentPhoto;
+      } | null)
+    | ({
+        relationTo: 'pushSubscriptions';
+        value: string | PushSubscription;
+      } | null)
+    | ({
+        relationTo: 'familyInvites';
+        value: string | FamilyInvite;
       } | null)
     | ({
         relationTo: 'orders';
@@ -1347,6 +1399,36 @@ export interface MomentPhotosSelect<T extends boolean = true> {
               filename?: T;
             };
       };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pushSubscriptions_select".
+ */
+export interface PushSubscriptionsSelect<T extends boolean = true> {
+  parent?: T;
+  family?: T;
+  endpoint?: T;
+  keys?: T;
+  device?: T;
+  lastSent?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "familyInvites_select".
+ */
+export interface FamilyInvitesSelect<T extends boolean = true> {
+  family?: T;
+  token?: T;
+  role?: T;
+  email?: T;
+  createdBy?: T;
+  expiresAt?: T;
+  usedBy?: T;
+  usedAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

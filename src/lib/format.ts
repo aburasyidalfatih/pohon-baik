@@ -17,3 +17,10 @@ export function hijri(iso: string) {
     return ''
   }
 }
+
+const BLN3 = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des']
+/** Tanggal ringkas untuk ruang sempit: "26 Sep 2026". */
+export function fmtShort(iso: string) {
+  const [y, m, d] = iso.split('-').map(Number)
+  return `${d} ${BLN3[m - 1]} ${y}`
+}

@@ -1,4 +1,5 @@
 import { postgresAdapter } from '@payloadcms/db-postgres'
+import { resendAdapter } from '@payloadcms/email-resend'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import { id } from '@payloadcms/translations/languages/id'
 import { en } from '@payloadcms/translations/languages/en'
@@ -15,6 +16,8 @@ import { Kurikulum } from './globals/Kurikulum'
 import { trackingCollections } from './collections/tracking'
 import { Orders } from './collections/billing'
 import { MomentPhotos } from './collections/photos'
+import { PushSubscriptions } from './collections/push'
+import { FamilyInvites } from './collections/invites'
 import { migrations } from './migrations'
 
 // Push skema otomatis hanya untuk database lokal saat pengembangan. Database server selalu lewat migrasi,
@@ -34,9 +37,20 @@ export default buildConfig({
     suppressHydrationWarning: true,
   },
   i18n: { supportedLanguages: { id, en }, fallbackLanguage: 'id' },
-  collections: [...contentCollections, Media, Users, Parents, Families, Children, ...trackingCollections, MomentPhotos, Orders],
+  collections: [...contentCollections, Media, Users, Parents, Families, Children, ...trackingCollections, MomentPhotos, PushSubscriptions, FamilyInvites, Orders],
   globals: [Kurikulum],
   editor: lexicalEditor(),
+  // Email (atur ulang sandi, undangan keluarga) lewat Resend bila RESEND_API_KEY diisi.
+  // Tanpa kunci: email hanya dicetak ke log server (cukup untuk pengembangan).
+  ...(process.env.RESEND_API_KEY
+    ? {
+        email: resendAdapter({
+          apiKey: process.env.RESEND_API_KEY,
+          defaultFromAddress: process.env.EMAIL_FROM || 'halo@pohonbaik.id',
+          defaultFromName: process.env.EMAIL_FROM_NAME || 'Pohon Baik',
+        }),
+      }
+    : {}),
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: { outputFile: path.resolve(dirname, 'payload-types.ts') },
   db: postgresAdapter({

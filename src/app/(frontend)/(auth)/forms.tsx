@@ -81,7 +81,7 @@ export function PasswordField({ id, label, hint, error, className, ...input }: {
 const focusId = (id: string) => requestAnimationFrame(() => document.getElementById(id)?.focus())
 
 // ---------- Masuk ----------
-export function SignInForm({ notice }: { notice?: { tone: 'success' | 'info'; text: string } }) {
+export function SignInForm({ notice, next }: { notice?: { tone: 'success' | 'info'; text: string }; next?: string }) {
   const [state, action, pending] = useActionState(signIn, undefined)
   const [errs, setErrs] = useState<{ email?: string; password?: string }>({})
 
@@ -100,6 +100,7 @@ export function SignInForm({ notice }: { notice?: { tone: 'success' | 'info'; te
   return (
     <form action={action} onSubmit={onSubmit} noValidate>
       {state?.error ? <Notice>{state.error}</Notice> : notice ? <Notice tone={notice.tone}>{notice.text}</Notice> : null}
+      {next && <input type="hidden" name="lanjut" value={next} />}
       <Field label="Email" id="si-email" error={errs.email}>
         <Input
           id="si-email"

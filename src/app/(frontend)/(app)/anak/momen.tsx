@@ -6,7 +6,7 @@ import { haptic } from '@/components/pb/celebrate'
 import { useToast } from '@/components/pb/feedback'
 import { EmptyState } from '@/components/ui/primitives'
 import { pesanGalat } from '@/lib/errors'
-import { fmtDate } from '@/lib/format'
+import { fmtDate, fmtShort } from '@/lib/format'
 import { cn } from '@/lib/utils'
 import { deleteMoment } from './actions'
 import { useAnak } from './anak-client'
@@ -119,12 +119,12 @@ export function MomenList({ moments }: { moments: Moment[] }) {
                 <div className="flex items-center justify-between gap-2">
                   <div className="flex min-w-0 items-center gap-1.5 text-[0.8125rem]">
                     <span aria-hidden>{cat.emoji}</span>
-                    <span className="font-bold text-ink-2">{cat.label}</span>
+                    <span className="font-bold whitespace-nowrap text-ink-2">{cat.label}</span>
                     <span className="text-ink-3" aria-hidden>
                       ·
                     </span>
-                    <time dateTime={m.date} className="text-ink-3">
-                      {fmtDate(m.date)}
+                    <time dateTime={m.date} title={fmtDate(m.date)} className="truncate text-ink-3">
+                      {fmtShort(m.date)}
                     </time>
                   </div>
                   <span className="flex flex-none">

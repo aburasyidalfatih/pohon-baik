@@ -28,7 +28,11 @@ function statusLine(c: ChildAccess) {
 export function LanggananView({ billing: b, orders, returned }: { billing: Billing; orders: OrderRow[]; returned: { status: string; names: string[] } | null }) {
   const router = useRouter()
   const toast = useToast()
-  const [picked, setPicked] = useState<string[]>(() => b.children.filter((c) => c.needsPayment && c.status !== 'waiver').map((c) => c.id))
+  // Selama masa coba masih panjang tidak ada yang dipilih otomatis: rasakan dulu manfaatnya.
+  // Dipilih otomatis hanya anak yang terkunci, masa cobanya hampir habis, atau perlu diperpanjang.
+  const urgent = (c: ChildAccess) => c.status === 'locked' || (c.status === 'trial' && !!b.remind) || (c.status === 'paid' && c.needsPayment)
+  const [picked, setPicked] = useState<string[]>(() => b.children.filter(urgent).map((c) => c.id))
+  const optional = !b.children.some(urgent)
   const [paying, startPaying] = useTransition()
   const [waiverOpen, setWaiverOpen] = useState(false)
   const [reason, setReason] = useState('')
@@ -123,8 +127,13 @@ export function LanggananView({ billing: b, orders, returned }: { billing: Billi
 
       {b.children.length > 0 && (
         <div className="mt-3">
-          <Button variant="primary" block disabled={!picked.length || paying || !b.canPay} aria-busy={paying} onClick={pay}>
-            {paying ? 'Membuka halaman bayar…' : picked.length ? `Bayar ${rupiah(total)} · ${picked.length} anak, 1 tahun` : 'Pilih anak yang akan diaktifkan'}
+          {optional && (
+            <p className="mb-2 px-1 text-[0.875rem] text-ink-2">
+              Belum perlu membayar sekarang. Kami ingatkan 5 hari sebelum masa coba berakhir. Bila ingin, Anda bisa mengaktifkan lebih awal.
+            </p>
+          )}
+          <Button variant={optional ? 'soft' : 'primary'} block disabled={!picked.length || paying || !b.canPay} aria-busy={paying} onClick={pay}>
+            {paying ? 'Membuka halaman bayar…' : picked.length ? `${optional ? 'Bayar lebih awal' : 'Bayar'} ${rupiah(total)} · ${picked.length} anak, 1 tahun` : optional ? 'Pilih anak untuk bayar lebih awal (opsional)' : 'Pilih anak yang akan diaktifkan'}
           </Button>
           {!b.canPay && <p role="alert" className="mt-2 text-center text-sm text-danger">Pembayaran belum tersedia. Hubungi tim Pohon Baik.</p>}
           <p className="mt-2 px-1 text-[0.8125rem] text-ink-3">

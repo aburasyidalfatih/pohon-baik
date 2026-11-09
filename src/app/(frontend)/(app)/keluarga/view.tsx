@@ -6,6 +6,7 @@ import { useEffect, useRef, useState, useSyncExternalStore, type FormEvent } fro
 import { haptic, hapticEnabled, setHapticEnabled } from '@/components/pb/celebrate'
 import { useConfirm, useToast } from '@/components/pb/feedback'
 import { clearAppCaches } from '@/components/pb/pwa-register'
+import { disablePushHere, PushToggle } from '@/components/pb/push-toggle'
 import { Sheet } from '@/components/pb/sheet'
 import { applyAppearance } from '@/components/pb/theme-sync'
 import { kidColor, PageHeader, Segmented } from '@/components/pb/ui'
@@ -18,11 +19,16 @@ import { cn } from '@/lib/utils'
 import { setModuleHidden } from '../actions'
 import { deleteChild, exportBackupJson, saveChild, updateFamilySettings } from './actions'
 import { ImportForm } from './import-form'
+import { MembersSection, type Invite, type Member } from './members'
 
 export type KeluargaViewProps = {
   today: string
   /** Ringkasan langganan untuk baris "Langganan" (mis. "Masa coba gratis · 12 hari lagi"). */
   billing: { summary: string; attention: boolean }
+  /** Kunci publik VAPID untuk notifikasi (kosong = belum diatur di server). */
+  vapidKey: string
+  members: Member[]
+  invites: Invite[]
   themes: { order: number; title: string; surah: string }[]
   parent: {
     id: string
@@ -101,7 +107,7 @@ const subscribeHaptic = (fn: () => void) => {
   }
 }
 
-export function KeluargaView({ today, billing, themes, parent, family, kids, branches, signOutAction }: KeluargaViewProps) {
+export function KeluargaView({ today, billing, vapidKey, members, invites, themes, parent, family, kids, branches, signOutAction }: KeluargaViewProps) {
   const toast = useToast()
   const confirm = useConfirm()
 
@@ -279,6 +285,7 @@ export function KeluargaView({ today, billing, themes, parent, family, kids, bra
     })
     if (!ok) return
     setLeaving(true)
+    await disablePushHere()
     await clearAppCaches()
     cachesCleared.current = true
     form.requestSubmit()
@@ -417,6 +424,8 @@ export function KeluargaView({ today, billing, themes, parent, family, kids, bra
           <span className="text-[0.9375rem]">Tambah anak</span>
         </button>
       </div>
+
+      <MembersSection members={members} invites={invites} familyName={family.name} />
 
       {/* ---------- Langganan ---------- */}
       <Link href="/langganan" className="pressable mt-3 flex min-h-14 items-center gap-3.5 rounded-card bg-surface p-4 shadow-card">
@@ -599,6 +608,7 @@ export function KeluargaView({ today, billing, themes, parent, family, kids, bra
             />
           </button>
         </div>
+        <PushToggle vapidKey={vapidKey} rowCls={rowCls} />
       </div>
 
       {/* ---------- Cadangan data ---------- */}

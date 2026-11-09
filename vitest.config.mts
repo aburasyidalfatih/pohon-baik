@@ -12,5 +12,6 @@ export default defineConfig({
     include: ['tests/int/**/*.int.spec.ts'],
     // Beberapa file uji menyalakan Payload (dan push skema) bersamaan: beri waktu lebih untuk beforeAll.
     hookTimeout: 60_000,
+    testTimeout: 30_000,
   },
 })
